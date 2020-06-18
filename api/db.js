@@ -1,6 +1,6 @@
-// const Axios = require("axios");
-// const qs = require("qs");
-// const sqlite3 = require('sqlite3').verbose();
+const Axios = require("axios");
+const qs = require("qs");
+const sqlite3 = require('sqlite3').verbose();
 
 
 //создаем базу данных
@@ -58,7 +58,7 @@ db.serialize(() => {
     console.log('Close the database connection.');
   });
 
-
+// `http://localhost:3003/api/in/users?id=${id}`
 
 // console.log(db);
 module.exports = function (req, res, next) {

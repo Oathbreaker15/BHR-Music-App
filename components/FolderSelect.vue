@@ -1,21 +1,25 @@
 <template>
-    <div class="folder-select-content">
-        <div class="folder-select-content__nav">
-            <span class="folder-select-content__arrow-icon" @click="goBack()" v-show="arrowVisible"></span>
-            <p class="folder-select-content__text">{{ currentItemName }}</p>
-            <button class="folder-select-content__btn" @click="addIntoDB(event)"><div class="folder-select-content__ok-icon"></div>Выбрать</button>
-        </div>
-        <div class="folder-select-content__body">
-            <div :class="['folder-select-content__body-item', {'_faded-item': item.type === 'audio'}]" 
-                 v-for="item in filesList" :key="item.name"
-                 @click="goTo(item)">
-                <!-- чтобы иметь возможность иметь выбор разных классов по условию, их следует записать через запятую в объекте
-                левая половина - название класса, правая - условие его присвоения -->
-                <div :class="{'folder-select-content__folder-icon': item.type === 'folder', 
-                              'folder-select-content__audio-icon': item.type === 'audio',}"></div>
-                {{ item.name }}
+    <div>      
+        <div class="folder-select-content">       
+            <div class="folder-select-content__nav">
+                <span class="folder-select-content__arrow-icon" @click="goBack()" v-show="arrowVisible"></span>
+                <p class="folder-select-content__text">{{ currentItemName }}</p>
+                <button class="folder-select-content__btn" @click="addPathToDB()"><div class="folder-select-content__ok-icon"></div>Выбрать</button>
             </div>
-            <div v-show="containsAudio" class="_faded-item">Внутри папки нет музыки</div>
+            <div class="folder-select-content__body">
+                <Loading v-if="$store.state.loading"></Loading>
+            <!-- <div class="folder-select-content__body"> -->
+                <div :class="['folder-select-content__body-item', {'_faded-item': item.type === 'audio'}]" 
+                    v-for="item in filesList" :key="item.name"
+                    @click="goTo(item)">
+                    <!-- чтобы иметь возможность иметь выбор разных классов по условию, их следует записать через запятую в объекте
+                    левая половина - название класса, правая - условие его присвоения -->
+                    <div :class="{'folder-select-content__folder-icon': item.type === 'folder', 
+                                'folder-select-content__audio-icon': item.type === 'audio',}"></div>
+                    {{ item.name }}
+                </div>
+                <div v-show="containsAudio" class="_faded-item">Внутри папки нет музыки</div>
+            </div>
         </div>
     </div>
 </template>
@@ -23,8 +27,12 @@
 <script>
 import Axios from "axios";
 import store from "vuex";
+import Loading from "~/components/Loading.vue";
 
 export default {
+    components: {
+        Loading
+	},
     data(){
         return {
              
@@ -37,8 +45,9 @@ export default {
         goBack(){
             this.$store.dispatch('GO_BACK');
         },
-        addIntoDB(context) {
-            console.log(context); 
+        async addPathToDB() {
+            await this.$store.dispatch('UPDATE_PATH');
+            this.$router.push("/");
         }
     },
     computed: {
@@ -60,11 +69,11 @@ export default {
             if(this.$store.getters.FILES_LIST.length === 0) {
                 return true;
             }
-        }
+        },
     },
     created() {
-        this.$store.dispatch('FETCH_FILES', '/');   
-        },
+        this.$store.dispatch('FETCH_FILES', `${this.$store.getters.CURRENT_ITEM_STATE[this.$store.getters.CURRENT_ITEM_STATE.length - 1].path}`);  
+    },   
 }
 </script>
 
@@ -74,6 +83,7 @@ export default {
         background-color: #fff;
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
         border-radius: 4px;
+        margin-bottom: 20px;
     }
 
     .folder-select-content__nav {
@@ -139,6 +149,11 @@ export default {
         justify-content: center;
         align-items: baseline;
         padding: 15px 0;
+    }
+
+    .folder-select-content__body {
+       box-sizing: border-box;
+       transform: translate(0, 0);
     }
 
     .folder-select-content__body-item {

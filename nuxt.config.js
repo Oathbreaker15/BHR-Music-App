@@ -9,7 +9,8 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
+      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' },
+      { name: 'referrer', content: 'no-referrer'}
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -24,8 +25,8 @@ export default {
   ** Global CSS
   */
   css: [
-    '@/assets/hamburgers-master/dist/hamburgers.css',
-    '@/assets/hamburgers-master/dist/hamburgers.min.css',
+    '@/assets/hamburgers.css',
+    '@/assets/hamburgers.min.css',
     '@/assets/style.css'
   ],
   /*
@@ -56,9 +57,16 @@ export default {
     ** You can extend webpack config here
     */
     extend (config, ctx) {
-      config.externals = {
-        'sqlite3': 'commonjs sqlite3'
-    }
+        config.externals = {
+          'sqlite3': 'commonjs sqlite3'
+      },
+      config.module.rules.push({
+        test: /\.(ogg|mp3|wav|mpe?g)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]'
+        }
+      })    
     }
   }
 }
