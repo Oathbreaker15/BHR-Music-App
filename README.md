@@ -1,6 +1,7 @@
 # music-app
 
 > My perfect Nuxt.js project
+Для работы также необходимо запускать API командой node api/api.js
 
 ## Build Setup
 
